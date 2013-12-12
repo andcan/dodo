@@ -4,23 +4,27 @@ packages:
   analyzer:
     description: analyzer
     source: hosted
-    version: "0.10.0"
+    version: "0.10.2"
   args:
     description: args
     source: hosted
-    version: "0.8.10+4"
+    version: "0.9.0"
   barback:
     description: barback
     source: hosted
-    version: "0.8.10+4"
+    version: "0.9.0"
   browser:
     description: browser
+    source: hosted
+    version: "0.9.0"
+  crypto:
+    description: crypto
     source: hosted
     version: "0.9.0"
   csslib:
     description: csslib
     source: hosted
-    version: "0.8.10+4"
+    version: "0.9.0"
   custom_element:
     description: custom_element
     source: hosted
@@ -37,10 +41,6 @@ packages:
     description: logging
     source: hosted
     version: "0.9.0"
-  meta:
-    description: meta
-    source: hosted
-    version: "0.8.8"
   mutation_observer:
     description: mutation_observer
     source: hosted
@@ -48,19 +48,27 @@ packages:
   observe:
     description: observe
     source: hosted
-    version: "0.8.10+4"
+    version: "0.9.1+1"
+  options_file:
+    description: options_file
+    source: hosted
+    version: "0.10.0"
   path:
     description: path
     source: hosted
-    version: "1.0.0-rc.1"
+    version: "0.9.0"
+  persistent:
+    description: persistent
+    source: hosted
+    version: "0.8.0"
   polymer:
     description: polymer
     source: hosted
-    version: "0.8.10+4"
+    version: "0.9.1+1"
   polymer_expressions:
     description: polymer_expressions
     source: hosted
-    version: "0.8.10+4"
+    version: "0.9.1"
   shadow_dom:
     description: shadow_dom
     source: hosted
@@ -69,14 +77,22 @@ packages:
     description: source_maps
     source: hosted
     version: "0.9.0"
+  sqljocky:
+    description: sqljocky
+    source: hosted
+    version: "0.9.0"
   stack_trace:
     description: stack_trace
     source: hosted
-    version: "0.8.10+4"
+    version: "0.9.0"
   template_binding:
     description: template_binding
     source: hosted
-    version: "0.8.10+4"
+    version: "0.9.0"
+  unittest:
+    description: unittest
+    source: hosted
+    version: "0.9.0"
   unmodifiable_collection:
     description: unmodifiable_collection
     source: hosted
