@@ -7,7 +7,9 @@ abstract class DataStore<E extends Entity> {
   
   Future<E> get (E e);
   
-  Future<bool> put (E e);
+  Future put (E e);
+  
+  Future update (E e, [List<Symbol> symbols = null]);
 }
 
 class MemoryDataStore<E extends Entity> implements DataStore<E> {

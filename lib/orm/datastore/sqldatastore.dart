@@ -3,12 +3,12 @@ part of orm;
 class SqlDataStore<E extends Entity> implements DataStore<E> {
   
   final Map<Symbol, Query> _gets = new Map<Symbol, Query> (),
-      _puts = new Map<Symbol, Query> ();
+      _puts = new Map<Symbol, Query> (), _upds = new Map<Symbol, Query> ();
   final ConnectionPool pool;
   
   SqlDataStore(this.pool);
   
-  void _handleError (MySqlException e) => throw e;
+  void _handleError (e) => throw e;
   
   void close () {
     pool.close();
@@ -16,52 +16,38 @@ class SqlDataStore<E extends Entity> implements DataStore<E> {
   
   Future<E> get (E e) {
     Completer<E> c = new Completer<E> ();
-    pool.startTransaction(consistent: true).then((transaction) {
-      InstanceMirror mirror = reflect (e);
-      Symbol id = e.idFieldName;
-      
-      bool newQuery = false;
-      Symbol name = mirror.type.qualifiedName;
-      Future<Query> q;
-      if (_gets.containsKey(name)) {
-        q = new Future.value(_gets[name]);
-      } else {
-        newQuery = true;
-        q = transaction
+    InstanceMirror mirror = reflect (e);
+    Symbol id = e.idFieldName;
+    
+    bool newQuery = false;
+    Symbol name = mirror.type.qualifiedName;
+    Future<Query> q;
+    if (_gets.containsKey(name)) {
+      q = new Future.value(_gets[name]);
+    } else {
+      newQuery = true;
+      q = pool
           .prepare('SELECT * FROM ${e.runtimeType} WHERE ${MirrorSystem.getName(id)} = ? LIMIT 1')
-            .then((query) => q = query, onError: _handleError);
+            .catchError(_handleError);
       }
-      
       q.then((query) {
         _gets[mirror.type.qualifiedName] = query;
-        query.execute([mirror.getField(id)]).then((Results results) {
-          results.length.then((length) {
-            switch (length) {
-              case '0':
-                c.complete(null);
-                break;
-              case '1':
-                results.first.then((Row result) {
-                  results.fields.forEach((field) {
-                    mirror.setField(new Symbol ('${field.name}'), result[field]);
-                    c.complete(e);
-                  });                
-                }, onError: _handleError);
-                break;
-              default:
-                c.completeError(new StateError ('Invalid results'));
-                break;
-            }
-            transaction.commit();
-          }, onError: _handleError);
+        return query.execute([mirror.getField(id).reflectee]);
+      }, onError: _handleError).then((Results results) {
+        results.first.then((Row result) {
+          int i = 0;
+          results.fields.forEach((field) {
+            mirror.setField(new Symbol ('${field.name}'), result[i]);
+            i++;
+          });
+          c.complete(e);
         }, onError: _handleError);
       }, onError: _handleError);
-    }, onError: _handleError);
     return c.future;
   }
   
-  Future<bool> put (E e) {
-    Completer<bool> c = new Completer<bool> ();
+  Future put (E e) {
+    Completer c = new Completer ();
     pool.startTransaction(consistent: true).then((transaction) {
       InstanceMirror mirror = reflect (e);
       Symbol name = mirror.type.qualifiedName;
@@ -78,7 +64,8 @@ class SqlDataStore<E extends Entity> implements DataStore<E> {
           qms.write('?, ');
         }
         q = transaction
-            .prepare('INSERT INTO ${e.runtimeType} VALUES (${qms.toString().substring(0, qms.length - 2)})');
+            .prepare('INSERT INTO ${e.runtimeType} VALUES (${qms.toString().substring(0, qms.length - 2)})')
+              .catchError(_handleError);
       }
       q.then((query) {
         if (newQuery) {
@@ -86,11 +73,51 @@ class SqlDataStore<E extends Entity> implements DataStore<E> {
         }
         query.execute(values).then((results) {
           //results will be empty, but auto-increment columns will be reported
-          transaction.commit();
-          c.complete(true);
+          transaction.commit().whenComplete(() => c.complete());
         }, onError: _handleError);
       }, onError: _handleError);
     });
+    return c.future;
+  }
+  
+  Future update (E e, [List<Symbol> symbols = null]) {
+    Completer c = new Completer ();
+    
+    pool.startTransaction(consistent: true).then((transaction) {
+      InstanceMirror mirror = reflect (e);
+      Symbol id = e.idFieldName;
+      Symbol name = mirror.type.qualifiedName;
+      Future<Query> q;
+      List values = [];
+      
+      bool newQuery = false;
+      if (_upds.containsKey(name)) {
+        q = new Future.value(_upds[name]);
+      } else {
+        StringBuffer sets = new StringBuffer ();
+        
+        if (symbols == null) {
+          //TODO
+        } else {
+          symbols.forEach((name) {
+            sets.write('${MirrorSystem.getName(name)} = ?, ');
+            values.add(mirror.getField(name).reflectee);
+          });
+        }
+        q = transaction
+            .prepare('UPDATE ${e.runtimeType} SET ${sets.toString().substring(0, sets.length - 2)} WHERE ${MirrorSystem.getName(id)} = ?')
+              .catchError(_handleError);
+      }
+      
+      q.then((query) {
+        values.add(mirror.getField(id).reflectee);
+        return query.execute(values);
+      }, onError: _handleError).then((_) {
+        c.complete();
+        transaction.commit();
+      }, onError: _handleError);
+    });
+    
     return c.future;
   }
 }

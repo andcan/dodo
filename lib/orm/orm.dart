@@ -27,7 +27,7 @@ class Orm {
   }
   
   void _listen (ContentChangeEvent e) {    
-    datastore.put(e.entity);
+    datastore.update(e.entity, [e.field]);
     e.sink();
   }
   

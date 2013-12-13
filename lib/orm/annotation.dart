@@ -57,7 +57,17 @@ class Persistable<T> {
     if (value == null) {
       return nullable;
     }
-    return min.compareTo(value) <= 0 && value.compareTo(max) <= 0;
+    if (min != null) {
+      if (min.compareTo(value) > 0) {
+        return false;
+      }
+    }
+    if (max != null) {
+      if (max.compareTo(value) < 0) {
+        return false;
+      }
+    }
+    return true;
   }
 }
 
@@ -72,7 +82,17 @@ class IntPersistable extends Persistable<num> {
     if (value == null) {
       return nullable;
     }
-    value >= min && value <= max;
+    if (min != null) {
+      if (value < min) {
+        return false;
+      }
+    }
+    if (max != null) {
+      if (value > max) {
+        return false;
+      }
+    }
+    return true;
   }
 }
 
@@ -87,7 +107,17 @@ class NumPersistable extends Persistable<num> {
     if (value == null) {
       return nullable;
     }
-    value >= min && value <= max;
+    if (min != null) {
+      if (value < min) {
+        return false;
+      }
+    }
+    if (max != null) {
+      if (value > max) {
+        return false;
+      }
+    }
+    return true;
   }
 }
 
@@ -105,7 +135,17 @@ class StringPersistable extends Persistable<String> {
       return nullable;
     }
     int length = value.length;
-    return length >= min && length <= max;
+    if (max != null) {
+      if (length > max) {
+        return false;
+      }
+    }
+    if (min != null) {
+      if (length < min) {
+        return false;
+      }
+    }
+    return true;
   }
 }
 
@@ -130,7 +170,17 @@ class IntId extends Id<num> {
     if (value == null) {
       return nullable;
     }
-    value >= min && value <= max;
+    if (min != null) {
+      if (value < min) {
+        return false;
+      }
+    }
+    if (max != null) {
+      if (value > max) {
+        return false;
+      }
+    }
+    return true;
   }
 }
 
@@ -141,6 +191,23 @@ class NumId extends Id<num> with _NumPersistable {
   
   const NumId ({String name, num max, num min}) :
     super (name: name, max: max, min: min);
+  
+  bool validate (int value) {
+    if (value == null) {
+      return nullable;
+    }
+    if (min != null) {
+      if (value < min) {
+        return false;
+      }
+    }
+    if (max != null) {
+      if (value > max) {
+        return false;
+      }
+    }
+    return true;
+  }
 }
 
 /**
@@ -157,6 +224,16 @@ class StringId extends Id<String> {
       return nullable;
     }
     int length = value.length;
-    return length >= min && length <= max;
+    if (max != null) {
+      if (length > max) {
+        return false;
+      }
+    }
+    if (min != null) {
+      if (length < min) {
+        return false;
+      }
+    }
+    return true;
   }
 }

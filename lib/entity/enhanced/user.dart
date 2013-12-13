@@ -21,6 +21,14 @@ class User extends Entity<String> {
   String get email => _email;
   String get name => _name;
   int get code => _code;
+  int get hashCode {
+    final int p = 37;
+    int hash = 1;
+    hash = p * hash + _email.hashCode;
+    hash = p * hash + _name.hashCode;
+    hash = p * hash + _code.hashCode;
+    return hash;
+  }
   
   set email (String email) {
     if (_PERSISTABLE_EMAIL.validate(email)) {
@@ -46,7 +54,8 @@ class User extends Entity<String> {
       throw new ArgumentError ('code is not valid');
     }
   }
+  bool operator == (User e) => e.email == _email && e.name == _name && e.code == _code;
   static const Symbol _SYMBOL_EMAIL = const Symbol ('email'), _SYMBOL_NAME = const Symbol ('name'), _SYMBOL_CODE = const Symbol ('code');
-  static const Persistable _PERSISTABLE_EMAIL = const Id (name: 'email'), _PERSISTABLE_NAME = const Persistable (), _PERSISTABLE_CODE = const Persistable ();
+  static const Persistable _PERSISTABLE_EMAIL = const StringPersistable (name: 'email'), _PERSISTABLE_NAME = const StringPersistable (), _PERSISTABLE_CODE = const IntPersistable ();
 }
   

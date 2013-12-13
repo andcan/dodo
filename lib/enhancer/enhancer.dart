@@ -1,5 +1,6 @@
 library enhancer;
 
+import 'dart:async';
 import 'dart:io';
 import 'dart:mirrors';
 
@@ -53,7 +54,8 @@ class FileEnhancer extends GeneralizingASTVisitor implements Enhancer<String, St
   }
 }
 
-void enhance (String entities, String enhanced) {
+Future enhance (String entities, String enhanced) {
+  Completer c = new Completer ();
   Directory es = new Directory(entities);
   Directory en = new Directory(enhanced);
   if (!en.existsSync()) {
@@ -75,6 +77,9 @@ void enhance (String entities, String enhanced) {
         e.writeAsString(enhancer.enhance(file.path), mode: WRITE);
       }
     }
-  }).whenComplete(() => lib.writeAsString(fls.toString(), mode: WRITE));
-  
+  }).whenComplete(() {
+    lib.writeAsString(fls.toString(), mode: WRITE);
+    c.complete();
+  });
+  return c.future;
 }

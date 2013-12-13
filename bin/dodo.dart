@@ -10,6 +10,12 @@ void main () {
   var datastore = new SqlDataStore(
       new ConnectionPool(host: '127.0.0.1', port: 3306, user: 'root', password: 'iU4hrS16f5.93', db: 'dodo', max: 5));
   var orm = new Orm(datastore);
-  User u = new User (email: 'asd', code: 15, name: 'Emilio');
-  orm.persist(u).whenComplete(() => datastore.close());
+  User us = new User(email: 'bcgh', code: 72);
+  orm.persist(us);
+  us.code = 50;
+  /*datastore.get(us).whenComplete(() {
+    print (us.code);
+    datastore.close();
+  });*/
+  
 }
