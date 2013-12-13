@@ -1,27 +1,40 @@
 part of orm;
 
 /**
- * Mixin for [IntField] and [IntId]
+ * Mixin for [IntPersistable] and [IntId]
  */
 abstract class _IntPersistable implements Persistable<num> {
   
-  bool validate (int value) => value >= min && value <= max;
+  bool validate (int value) {
+    if (value == null) {
+      return nullable;
+    }
+    value >= min && value <= max;
+  }
 }
 
 /**
- * Mixin for [NumField] and [NumId]
+ * Mixin for [NumPersistable] and [NumId]
  */
 abstract class _NumPersistable implements Persistable<num> {
   
-  bool validate (num value) => value >= min && value <= max;
+  bool validate (num value) {
+    if (value == null) {
+      return nullable;
+    }
+    value >= min && value <= max;
+  }
 }
 
 /**
- * Mixin for [StringField] and [StringId]
+ * Mixin for [StringPersistable] and [StringId]
  */
 abstract class _StringPersistable implements Persistable<String> {
   
   bool validate (String value) {
+    if (value == null) {
+      return nullable;
+    }
     int length = value.length;
     return length >= min && length <= max;
   }
@@ -35,10 +48,15 @@ class Persistable<T> {
   final String name;
   final num max;
   final num min;
+  final bool nullable;
   
-  const Persistable ({this.name: null, this.max, this.min});
+  const Persistable ({this.name: null, this.max, this.min, bool nullable: true}) :
+    this.nullable = nullable;
   
   bool validate (Comparable<T> value) {
+    if (value == null) {
+      return nullable;
+    }
     return min.compareTo(value) <= 0 && value.compareTo(max) <= 0;
   }
 }
@@ -46,27 +64,49 @@ class Persistable<T> {
 /**
  * Annotation for [int] fields
  */
-class IntField extends Persistable<num> with _IntPersistable {
-  const IntField ({String name, num max, num min}) :
-    super (name: name, max: max, min: min);
+class IntPersistable extends Persistable<num> {
+  const IntPersistable ({String name, num max, num min, bool nullable: true}) :
+    super (name: name, max: max, min: min, nullable: nullable);
+  
+  bool validate (int value) {
+    if (value == null) {
+      return nullable;
+    }
+    value >= min && value <= max;
+  }
 }
 
 /**
  * Annotation for [num] fields
  */
-class NumField extends Persistable<num> with _NumPersistable {
-  const NumField ({String name, num max, num min}) :
-    super (name: name, max: max, min: min);
+class NumPersistable extends Persistable<num> {
+  const NumPersistable ({String name, num max, num min, bool nullable: true}) :
+    super (name: name, max: max, min: min, nullable: nullable);
+  
+  bool validate (num value) {
+    if (value == null) {
+      return nullable;
+    }
+    value >= min && value <= max;
+  }
 }
 
 /**
  * Annotation for [String] fields
  */
-class StringField extends Persistable<String> with _StringPersistable {
-  final RegExp match;
+class StringPersistable extends Persistable<String> {
+  final String match;
   
-  const StringField ({String name, num max, num min, this.match}) :
-    super (name: name, max: max, min: min);
+  const StringPersistable ({String name, num max, num min, bool nullable: true, this.match}) :
+    super (name: name, max: max, min: min, nullable: nullable);
+  
+  bool validate (String value) {
+    if (value == null) {
+      return nullable;
+    }
+    int length = value.length;
+    return length >= min && length <= max;
+  }
 }
 
 /**
@@ -75,16 +115,23 @@ class StringField extends Persistable<String> with _StringPersistable {
  */
 class Id<T> extends Persistable<T> {
   const Id({String name: null, num max: null, num min: null}) :
-    super (name: name, max: max, min: min);
+    super (name: name, max: max, min: min, nullable: false);
 }
 
 /**
  * Annotation for [int] ids
  */
-class IntId extends Id<num> with _IntPersistable {
+class IntId extends Id<num> {
   
   const IntId ({String name, num max, num min}) :
     super (name: name, max: max, min: min);
+  
+  bool validate (int value) {
+    if (value == null) {
+      return nullable;
+    }
+    value >= min && value <= max;
+  }
 }
 
 /**
@@ -99,9 +146,17 @@ class NumId extends Id<num> with _NumPersistable {
 /**
  * Annotation for [String] ids
  */
-class StringId extends Id<String> with _StringPersistable {
+class StringId extends Id<String> {
   final RegExp match;
   
   const StringId ({String name, num max, num min, this.match}) :
     super (name: name, max: max, min: min);
+  
+  bool validate (String value) {
+    if (value == null) {
+      return nullable;
+    }
+    int length = value.length;
+    return length >= min && length <= max;
+  }
 }
