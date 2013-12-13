@@ -2,12 +2,17 @@ part of entities;
 
 class User extends Entity<String> {
   User.empty ();
-  User ({String email, String name, int code}) :
+  User ({String email, String name, int code}) :    
     _email = email, _name = name, _code = code;
+  factory User.fromMap (Map<String, dynamic> map) {
+    return new User(email: map['email'], name: map['name'], code: map['code']);
+  }
   
   String _email;
   String _name;
   int _code;
+  
+  List asArray () => [_email, _name, _code];
   
   bool _validate (Persistable persistable, value) => persistable.validate(value);
   

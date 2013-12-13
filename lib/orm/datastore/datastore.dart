@@ -2,25 +2,32 @@ part of orm;
 
 typedef bool where (obj);
 
-abstract class DataStore {
-  get (Symbol name, id);
+abstract class DataStore<E extends Entity> {
+  void close ();
   
-  void put (Entity e);
+  Future<E> get (E e);
+  
+  Future<bool> put (E e);
 }
 
-class MemoryDataStore implements DataStore {
+class MemoryDataStore<E extends Entity> implements DataStore<E> {
   Map<Symbol, Map> objs = new Map<Symbol, Map> ();
   
-  get (Symbol name, id) {
+  Future close () => new Future.value(null);
+  
+  Future<E> get (E e) {
+    Completer<E> c = new Completer<E>();
+    Symbol name = e.idFieldName;
     if (objs.containsKey(name)) {
       Map m = objs[name];
-      return m[id];
+      c.complete(m[reflect(e).getField(e.idFieldName)]);
     } else {
-      throw new ArgumentError('No instance with this name');
+      c.completeError(new ArgumentError('No instance with this name'));
     }
+    return c.future;
   }
   
-  void put (Entity e) {
+  Future put (E e) {
     InstanceMirror im = reflect(e);
     Symbol name = im.type.qualifiedName;
     Map m;
@@ -31,5 +38,6 @@ class MemoryDataStore implements DataStore {
       objs[name] = m;
     }
     m[im.getField(e.idFieldName)] = e;
+    return new Future.value(true);
   }
 }

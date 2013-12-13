@@ -26,11 +26,8 @@ class Orm {
     _onChange.stream.listen(_listen, onError: (e) => print (e));
   }
   
-  void _listen (ContentChangeEvent e) {
-    InstanceMirror mirror = reflect (e.entity);
-    ClassMirror type = mirror.type;
-    
-    datastore.put(type.qualifiedName, e.entity);
+  void _listen (ContentChangeEvent e) {    
+    datastore.put(e.entity);
     e.sink();
   }
   
@@ -57,8 +54,8 @@ class Orm {
     });
   }*/
   
-  void persist (Entity e) {
-    e.changeStreamController = new Optional(_onChange);      
-    datastore.put(reflect (e).type.qualifiedName, e);
+  Future<bool> persist (Entity e) {
+    e.changeStreamController = new Optional(_onChange);
+    return datastore.put(e);
   }
 }

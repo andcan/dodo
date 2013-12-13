@@ -8,6 +8,8 @@ abstract class Entity<T> {
   
   Symbol get idFieldName;
   
+  List asArray ();
+  
   void propertyChanged (Symbol field) {
     if (changeStreamController == null) {
       throw new StateError('invalid stream');
