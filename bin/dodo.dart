@@ -1,6 +1,7 @@
 import '../lib/orm/orm.dart';
 import '../lib/entity/enhanced/entities.dart';
 import '../lib/enhancer/enhancer.dart';
+import 'dart:async';
 import 'package:sqljocky/sqljocky.dart';
 
 import 'dart:mirrors';
@@ -13,9 +14,11 @@ void main () {
   User us = new User(email: 'bcgh', code: 72);
   orm.persist(us);
   us.code = 50;
-  /*datastore.get(us).whenComplete(() {
-    print (us.code);
-    datastore.close();
-  });*/
-  
+  User user = new User(email: 'ciaofess');
+  new Future.delayed(new Duration(seconds: 3), () {
+    datastore.get(user).whenComplete(() {
+      print (user.code);
+      datastore.close();
+    });
+  });
 }

@@ -8,8 +8,6 @@ class SqlDataStore<E extends Entity> implements DataStore<E> {
   
   SqlDataStore(this.pool);
   
-  void _handleError (e) => throw e;
-  
   void close () {
     pool.close();
   }
@@ -27,13 +25,12 @@ class SqlDataStore<E extends Entity> implements DataStore<E> {
     } else {
       newQuery = true;
       q = pool
-          .prepare('SELECT * FROM ${e.runtimeType} WHERE ${MirrorSystem.getName(id)} = ? LIMIT 1')
-            .catchError(_handleError);
+          .prepare('SELECT * FROM ${e.runtimeType} WHERE ${MirrorSystem.getName(id)} = ? LIMIT 1');
       }
       q.then((query) {
         _gets[mirror.type.qualifiedName] = query;
         return query.execute([mirror.getField(id).reflectee]);
-      }, onError: _handleError).then((Results results) {
+      }).then((Results results) {
         results.first.then((Row result) {
           int i = 0;
           results.fields.forEach((field) {
@@ -41,8 +38,8 @@ class SqlDataStore<E extends Entity> implements DataStore<E> {
             i++;
           });
           c.complete(e);
-        }, onError: _handleError);
-      }, onError: _handleError);
+        });
+      });
     return c.future;
   }
   
@@ -64,8 +61,7 @@ class SqlDataStore<E extends Entity> implements DataStore<E> {
           qms.write('?, ');
         }
         q = transaction
-            .prepare('INSERT INTO ${e.runtimeType} VALUES (${qms.toString().substring(0, qms.length - 2)})')
-              .catchError(_handleError);
+            .prepare('INSERT INTO ${e.runtimeType} VALUES (${qms.toString().substring(0, qms.length - 2)})');
       }
       q.then((query) {
         if (newQuery) {
@@ -74,8 +70,8 @@ class SqlDataStore<E extends Entity> implements DataStore<E> {
         query.execute(values).then((results) {
           //results will be empty, but auto-increment columns will be reported
           transaction.commit().whenComplete(() => c.complete());
-        }, onError: _handleError);
-      }, onError: _handleError);
+        });
+      });
     });
     return c.future;
   }
@@ -105,17 +101,16 @@ class SqlDataStore<E extends Entity> implements DataStore<E> {
           });
         }
         q = transaction
-            .prepare('UPDATE ${e.runtimeType} SET ${sets.toString().substring(0, sets.length - 2)} WHERE ${MirrorSystem.getName(id)} = ?')
-              .catchError(_handleError);
+            .prepare('UPDATE ${e.runtimeType} SET ${sets.toString().substring(0, sets.length - 2)} WHERE ${MirrorSystem.getName(id)} = ?');
       }
       
       q.then((query) {
         values.add(mirror.getField(id).reflectee);
         return query.execute(values);
-      }, onError: _handleError).then((_) {
+      }).then((_) {
         c.complete();
         transaction.commit();
-      }, onError: _handleError);
+      });
     });
     
     return c.future;
