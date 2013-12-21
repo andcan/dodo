@@ -1,7 +1,7 @@
 import 'dart:html';
 import 'package:polymer/polymer.dart';
 
-const String ELEMENT_NAME = 'menu-bar';
+const String ELEMENT_NAME = 'd-menubar';
 const String ITEM_CONTAINER = '${ELEMENT_NAME}-item-container';
 /**
  * 
