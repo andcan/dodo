@@ -1,7 +1,6 @@
 import '../orm/orm.dart';
 
 class User {
-  @Id(name: 'email') String email;
-  @Persistable() String name;
-  @Persistable() int code;
+  @Id(max: 150) String email;
+  @Persistable(max: 64, min: 64) String pass;
 }

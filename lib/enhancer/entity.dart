@@ -10,10 +10,11 @@ class Entity {
     String name = cd.name.name;
     StringBuffer arr = new StringBuffer ('['),
         cs = new StringBuffer ('$name.empty ();\n  $name ({'), cs1 = new StringBuffer (), 
-        cs2 = new StringBuffer ('factory $name.fromMap (Map<String, dynamic> map) {\n    return new User('),
+        cs2 = new StringBuffer ('factory $name.fromMap (Map<String, dynamic> map) {\n    return new $name('),
         eq = new StringBuffer (), fs = new StringBuffer (), gs = new StringBuffer (),
         hc = new StringBuffer (), ps = new StringBuffer ('static const Persistable '),
-        ss = new StringBuffer (), symbols = new StringBuffer ('static const Symbol ');
+        sql = new StringBuffer ("static const String _SQL = 'CREATE TABLE $name ("), ss = new StringBuffer (),
+        symbols = new StringBuffer ('static const Symbol ');
     Member id;
     
     members.forEach((member) {
@@ -35,20 +36,34 @@ class Entity {
       
       String ann;
       Annotation annotation = member.a;
+      Map<String, String> args = new Map<String, String> ();
+      annotation.arguments.arguments.forEach((arg) {
+        var s = arg.toString().split(': ');
+        args[s[0]] = s[1];
+      });
+      String sqlType;
       switch (member.tn.name.toString()) {
         case 'int':
           ann = 'Int';
+          sqlType = 'INT';
           break;
         case 'num':
           ann = 'Num';
+          sqlType = 'DOUBLE';
           break;
         case 'String':
           ann = 'String';
+          if (args.containsKey('max')) {
+            sqlType = 'VARCHAR(${args['max']})';
+          } else {
+            sqlType = 'VARCHAR(256)';
+          }
           break;
         default:
           ann = '';
           break;
       }
+      sql.write('$name $sqlType ${args.containsKey('nullable') && args['nullable'] ? ' ': 'NOT '}NULL, ');
       ps.write('_PERSISTABLE$nameuc = const ${ann}Persistable ${annotation.arguments.toString()}, ');
     });
     String _arr = '${arr.toString().substring(0, arr.length - 2)}]';
@@ -58,6 +73,7 @@ class Entity {
     ${cs1.toString().substring(0, cs1.length - 2)};
   ${cs2.toString().substring(0, cs2.length - 2)});
   }''';
+    String _sql = "${sql.toString().substring(0, sql.length - 2)}, PRIMARY KEY(${id.vd.name}));';";
     String _symbols = '${symbols.toString().substring(0, symbols.length - 2)};';
     String _ps = '${ps.toString().substring(0, ps.length - 2)};';
     
@@ -81,6 +97,7 @@ class ${cd.abstractKeyword == null ? '' : '${cd.abstractKeyword} '}${cd.name} ex
   }
   $ss
   bool operator == ($name e) => $_eq;
+  $_sql
   $_symbols
   $_ps
 }''';

@@ -1,7 +1,7 @@
 name: dodo
 description: Dodo
 environment:
-  sdk: 1.0.0+3.r30188
+  sdk: '>=1.0.0+3.r30188'
 dependencies:
   analyzer: 0.10.2
   args: 0.9.0
@@ -9,6 +9,7 @@ dependencies:
   persistent: 0.8.0
   polymer: 0.9.1+1
   sqljocky: 0.9.0
+  utf: any
 transformers:
 - polymer:
     entry_points: web/html/dodo.html
