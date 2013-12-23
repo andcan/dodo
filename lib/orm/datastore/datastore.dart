@@ -5,7 +5,9 @@ typedef bool where (obj);
 abstract class DataStore<E extends Entity> {
   void close ();
   
-  Future<E> get (E e);
+  Future delete (E e);
+  
+  Future<Optional<E>> get (E e);
   
   Future put (E e);
   

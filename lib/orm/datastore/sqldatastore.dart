@@ -2,7 +2,7 @@ part of orm;
 
 class SqlDataStore<E extends Entity> implements DataStore<E> {
   
-  final Map<Symbol, Query> _gets = new Map<Symbol, Query> (),
+  final Map<Symbol, Query> _dels = new Map<Symbol, Query> (), _gets = new Map<Symbol, Query> (),
       _puts = new Map<Symbol, Query> (), _upds = new Map<Symbol, Query> ();
   final ConnectionPool pool;
   
@@ -12,8 +12,34 @@ class SqlDataStore<E extends Entity> implements DataStore<E> {
     pool.close();
   }
   
-  Future<E> get (E e) {
-    Completer<E> c = new Completer<E> ();
+  Future delete (E e) {
+    Completer c = new Completer ();
+    InstanceMirror mirror = reflect (e);
+    Symbol id = e.idFieldName;
+    
+    Symbol name = mirror.type.qualifiedName;
+    bool newQuery = false;
+    Future<Query> q;
+    if (_dels.containsKey(name)) {
+      q = new Future.value(_dels[name]);
+    } else {
+      newQuery = true;
+      q = pool
+          .prepare('DELETE FROM ${e.runtimeType} WHERE ${MirrorSystem.getName(id)} = ?');
+    }
+    q.then((query) {
+      if (newQuery) {
+        _dels[mirror.type.qualifiedName] = query;
+      }
+      return query.execute([mirror.getField(id).reflectee]);
+    }).then((Results results) {
+      c.complete();
+    });
+    return c.future;
+  }
+  
+  Future<Optional<E>> get (E e) {
+    Completer<Optional<E>> c = new Completer<Optional<E>> ();
     InstanceMirror mirror = reflect (e);
     Symbol id = e.idFieldName;
     
@@ -26,20 +52,23 @@ class SqlDataStore<E extends Entity> implements DataStore<E> {
       newQuery = true;
       q = pool
           .prepare('SELECT * FROM ${e.runtimeType} WHERE ${MirrorSystem.getName(id)} = ? LIMIT 1');
-      }
-      q.then((query) {
+    }
+    q.then((query) {
+      if (newQuery) {
         _gets[mirror.type.qualifiedName] = query;
-        return query.execute([mirror.getField(id).reflectee]);
-      }).then((Results results) {
-        results.first.then((Row result) {
-          int i = 0;
-          results.fields.forEach((field) {
-            mirror.setField(new Symbol ('${field.name}'), result[i]);
-            i++;
-          });
-          c.complete(e);
+      }
+      return query.execute([mirror.getField(id).reflectee]);
+    }).then((Results results) {
+      results.first.then((Row result) {
+        int i = 0;
+        results.fields.forEach((field) {
+          mirror.setField(new Symbol ('${field.name}'), result[i]);
+          i++;
         });
-      });
+        c.complete(new Optional<E>(e));
+      }).catchError((e) => c.complete(new Optional<E>.absent()),
+          test: (e) => e is StateError);
+    });
     return c.future;
   }
   
