@@ -31,29 +31,6 @@ class Orm {
     e.sink();
   }
   
-  /*void register (Type t) {
-    ClassMirror mirror = reflectClass(t);
-    
-    mirror.instanceMembers.forEach((name, method) {
-      if (method.isGetter) {
-        Member id;
-        List<Member> members = [];
-        
-        method.metadata.forEach((im) {
-          if (im is Persistable) {
-            Member m = new Member(name, mapped: im.name, max: im.max, min: im.min);
-            if (im is Id) {
-              id = m;
-            } else {
-              members.add(m);
-            }
-          }
-        });
-        _registered[mirror.qualifiedName] = new Meta (id, members);
-      }
-    });
-  }*/
-  
   Future<bool> persist (Entity e) {
     e.changeStreamController = new Optional(_onChange);
     return datastore.put(e);
