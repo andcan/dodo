@@ -40,11 +40,12 @@ class Node {
             if (m.code != Protocol.CODE_AUTHENTICATE) {
               socket.add('401');
             } else {
-              orm.datastore.get(new User(email: m[0])).then((User user) {
-                Hash h = hash.newInstance()
-                    ..add(m[1].codeUnits);
-                String pass = CryptoUtils.bytesToHex(h.close());
-                socket.add('${pass == user.pass}');
+              orm.datastore.get(new User(email: m[0])).then((Optional<User> opt) {
+                if (opt.isAbsent) {
+                  socket.add('false');
+                } else {
+                  socket.add('${m[1] == opt.value.pass}');
+                }
               });
             }
           }

@@ -1,3 +1,4 @@
+import 'package:crypto/crypto.dart';
 import 'package:sqljocky/sqljocky.dart';
 
 import '../lib/grid/grid.dart';
@@ -17,7 +18,9 @@ void main () {
       }
       var protocol = new Protocol();
       websocket.listen((data) => print(data));
-      websocket.add(protocol.authenticate('asd', 'ciaofess').toString());
+      Hash h = new SHA256()..add('ciaofess'.codeUnits);
+      websocket.add(
+          protocol.authenticate('asd', CryptoUtils.bytesToHex(h.close())).toString());
     });
   });
 }

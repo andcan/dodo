@@ -33,7 +33,7 @@ class SqlDataStore<E extends Entity> implements DataStore<E> {
       }
       return query.execute([mirror.getField(id).reflectee]);
     }).then((Results results) {
-      c.complete();
+      c.complete(results.affectedRows);
     });
     return c.future;
   }

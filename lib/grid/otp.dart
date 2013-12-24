@@ -6,15 +6,26 @@ class KeyManager {
   
   KeyManager (this.orm);
   
-  Future delete (Key k) {
-    
+  Future delete (Key k) => new File (k.path).delete();
+  
+  Future<Key> generate (Key k, {bool overwrite: false}) {
+    Completer<Key> c = new Completer<Key>();
+    File f = new File(k.path);
+    f.exists().then((exists) {
+      if (exists) {
+        if (overwrite) {
+          f.delete().whenComplete(() {
+            //generate
+          });
+        }
+      } else {
+        //generate
+      }
+    });
+    return c.future;
   }
   
-  Future<List<int>> load ();
-  
-  Future generate (String id) {
-    
-  }
+  Future<List<int>> load (Key k) => new File(k.path).readAsBytes();
 }
 
 class Otp implements Hash {
