@@ -28,28 +28,28 @@ class KeyManager {
   Future<List<int>> load (Key k) => new File(k.path).readAsBytes();
 }
 
-class Otp implements Hash {
-  /**
-   * Add a list of bytes to the hash computation.
-   */
-  void add(List<int> data);
+class OtpTransformer implements StreamTransformer<List<int>, List<int>> {
+  final Key _key;
+  File _file;
   
-  /**
-   * Finish the hash computation and extract the message digest as
-   * a list of bytes.
-   */
-  List<int> close();
+  OtpTransformer (Key key) :
+    this._key = key, _file = new File(key.path);
   
-  /**
-   * Returns a new instance of this hash function.
-   */
-  Hash newInstance() => new Otp ();
-  
-  /**
-   * Internal block size of the hash in bytes.
-   *
-   * This is exposed for use by the HMAC class which needs to know the
-   * block size for the [Hash] it is using.
-   */
-  int get blockSize => throw new UnsupportedError('Not supported');
+  var controller = new StreamController<List<int>>();
+  Stream<List<int>> bind(Stream<List<int>> stream) {
+    if (!_file.existsSync()) {
+      throw new ArgumentError('${_file.path} does not exist');
+    }
+    int index = 0;
+    var keyData = _file.readAsBytesSync();
+    stream.listen((List<int> data) {
+      List<int> transformed = new List<int> ();
+      data.forEach((int i) {
+        transformed.add(i ^ keyData[index++]);
+      });
+      controller.add(transformed);
+    }, onError: (e) => controller.addError(e), onDone: () => controller.close(),
+        cancelOnError: false);
+    return controller.stream;
+  }
 }

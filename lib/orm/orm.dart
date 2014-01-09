@@ -32,7 +32,7 @@ class Orm {
   }
   
   Future<bool> persist (Entity e) {
-    e.changeStreamController = new Optional(_onChange);
+    e._changeStreamController = new Optional(_onChange);
     return datastore.put(e);
   }
 }

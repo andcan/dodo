@@ -2,7 +2,7 @@ part of orm;
 
 abstract class Entity<T> {
   
-  Optional<StreamController<ContentChangeEvent>> changeStreamController = 
+  Optional<StreamController<ContentChangeEvent>> _changeStreamController = 
       new Optional<StreamController<ContentChangeEvent>>.absent();
   ContentChangeEvent _last;
   
@@ -11,16 +11,16 @@ abstract class Entity<T> {
   List asArray ();
   
   void propertyChanged (Symbol field) {
-    if (changeStreamController == null) {
+    if (_changeStreamController == null) {
       throw new StateError('invalid stream');
-    } else if (changeStreamController.isNotNull) {
+    } else if (_changeStreamController.isNotNull) {
       if (_last == null) {
         _last = new ContentChangeEvent(this, field);
-        changeStreamController.value.add(_last);
+        _changeStreamController.value.add(_last);
       } else {
         if (_last.sinked) {
           _last = new ContentChangeEvent(this, field);
-          changeStreamController.value.add(_last);
+          _changeStreamController.value.add(_last);
         } /*else {
           //Nothing to do: object already need to be updated, update operations will be executed once
         }*/
