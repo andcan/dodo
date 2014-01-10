@@ -110,7 +110,7 @@ Map<String, Field> parseFields (Map fields, Map<String, Format> formats) {
 SjsType parseType (Map<String, dynamic> properties, Map<String, Format> formats) {
     Map values = parse(properties, 
         [Key.FIELDS, Key.TYPE_SCHEMA]);
-    properties[Key.FIELDS.name] = parseFields(properties[Key.FIELDS.name], formats);
+    values[Key.FIELDS.name] = parseFields(values[Key.FIELDS.name], formats);
     
     return new SjsType(values[Key.FIELDS.name], values[Key.TYPE_SCHEMA.name]);
 }

@@ -1,5 +1,22 @@
 part of grid;
 
+class KeyManager {
+  
+  final Orm orm;
+  
+  KeyManager (this.orm);
+  
+  Future delete (Key k) {
+    
+  }
+  
+  Future<List<int>> load ();
+  
+  Future generate (String id) {
+    
+  }
+}
+
 class Otp implements Hash {
   /**
    * Add a list of bytes to the hash computation.

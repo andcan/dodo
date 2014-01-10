@@ -1,5 +1,4 @@
 import 'package:unittest/unittest.dart';
-import 'package:json/json.dart' as json;
 import '../lib/sjs/sjs.dart';
 
 main () {
@@ -73,7 +72,10 @@ main () {
       'b': new Field([fmt1], 2, 5, false, 'string')
     };
     
-    //expect (parseFields(fields, formats), equals (fs));//Test failed: Caught Illegal argument(s): format is dart.collection._LinkedHashMap expected other
+    expect (parseFields(fields, formats), equals (fs));//Test failed: Caught Illegal argument(s): format is dart.collection._LinkedHashMap expected other
+  });
+  
+  test('schema validation', () {
     Schema s = new Schema.fromMap({
       'name': 'asd',
       'fields': {
@@ -93,11 +95,21 @@ main () {
         }
       }
     });
-    print (s.fields);
-    print (s.formats);
-    print (s.name);
-    print (s.type);
-    print (s.types);
+    expect(s.validate({
+      'asd': {
+        'a': '1a'
+      }
+    }), isFalse);
+    expect(s.validate({
+      'asd': {
+        'a': '1'
+      }
+    }), isTrue);
+    expect(s.validate({
+      'asd': {
+        'a': 1
+      }
+    }), isTrue);
   });
 }
 

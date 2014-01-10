@@ -66,61 +66,87 @@ class Schema {
   }
   
   bool validate (Map json) {
-    fields.forEach((name, field) {
+    var names = fields.keys;
+    for (String name in names) {
+      var field = fields[name];
+      
+      if (! json.containsKey(name)) {
+        return ! field.required;
+      } else {
+        if (! _validate(json[name], field.type)) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+  
+  bool _validate (value, String type) {
+    if (null == value) {
+      return false;
+    }
+    
+    bool valid = true;
+    var conversionError = (value) {
+      valid = false;
+      return -1;
+    };
+    
+    switch (type) {
+      case 'int':
+        if (value is! int) {
+          if (value is! String) {
+            valid = false;
+          } else {
+            int.parse(value, onError: conversionError);
+          }
+        }
+        break;
+      case 'num':
+        if (value is! int) {
+          if (value is! String) {
+            valid = false;
+          } else {
+            double.parse(value, conversionError);
+          }
+        }
+        break;
+      case 'string':
+        if (value is! String) {
+          valid = false;
+        }
+        break;
+      case 'object':
+        if (value is! Map) {
+          valid = false;
+        }
+        break;
+      default:
+        if (! types.containsKey(type)) {
+          valid = false;
+        } else {
+          valid = _validateObject(value, types[type]);
+        }
+        break;
+    }
+    return valid;
+  }
+  
+  bool _validateObject (Map value, SjsType type) {
+    var fields = type.fields;
+    var names = fields.keys;
+    for (String name in names) {
+      Field field = fields[name];
       if (field.required) {
-        if (! json.containsKey(name)) {
+        if (!value.containsKey(name)) {
           return false;
         } else {
-          bool valid = true;
-          var conversionError = (value) {
-            valid = false;
-            return -1;
-          };
-          String type = field.type;
-          var value = json[name];
-          if (null == value) {
-            return false;
-          } else if ('int' == type) {
-            if (value is! int) {
-              if (value is! String) {
-                valid = false;
-              } else {
-                int.parse(value, onError: conversionError);
-              }
-            }
-          } else if ('num' == type) {
-            if (value is! int) {
-              if (value is! String) {
-                valid = false;
-              } else {
-                double.parse(value, conversionError);
-              }
-            }
-          } else if ('string' == type) {
-            if (value is! String) {
-              valid = false;
-            }
-          } else {
-            if (! types.containsKey(type)) {
-              valid = false;
-            } else {
-              var sjsType = types[type];
-              var fields = sjsType.fields;
-              var names = fields.keys;
-              for (String name in names) {
-                var field = fields[name];
-                if (field.required) {
-                  //TODO
-                }
-              }
-            }
-          }
-          
-          if (! valid) {
+          if (! _validate(value[name], field.type)) {
             return false;
           }
         }
       }
-    });
+    }
+    return true;
   }
 }

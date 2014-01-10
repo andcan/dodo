@@ -11,7 +11,7 @@ class SjsType extends Object with HasType {
     this.type = type;
   }
   
-  int get hashCode => Util.hash([fields]);
+  int get hashCode => fields.hashCode;
   
   operator == (SjsType t) => fields == t.fields;
 }
