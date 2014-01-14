@@ -1,0 +1,33 @@
+{
+  "name": "dttpd",
+  "fields": {
+    "mappings": {
+      "type": "Mapping[]"
+    }
+  },
+  "formats": {
+    "ipv4": {
+      "caseSensitive": true,
+      "match": "\\b((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))\\b",
+      "multiLine": false,
+      "type": "string"
+    },
+    "path": {
+      "caseSensitive": true,
+      "match": "((\\/\\w+(\\/)?)+)|(\/)",
+      "multiLine": false,
+      "type": "string"
+    }
+  },
+  "types": {
+    "Mapping": {
+      "fields": {
+        "path": {
+          "format": "path",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    }
+  }
+}

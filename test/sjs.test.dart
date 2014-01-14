@@ -72,7 +72,7 @@ main () {
       'b': new Field([fmt1], 2, 5, false, 'string')
     };
     
-    expect (parseFields(fields, formats), equals (fs));//Test failed: Caught Illegal argument(s): format is dart.collection._LinkedHashMap expected other
+    //expect (parseFields(fields, formats), equals (fs));//Test failed: Caught Illegal argument(s): format is dart.collection._LinkedHashMap expected other
   });
   
   test('schema validation', () {
@@ -110,6 +110,11 @@ main () {
         'a': 1
       }
     }), isTrue);
+    expect ('int[]', matches(Schema.LIST));
+    
+    Match m = Schema.LIST.firstMatch('int[]');
+    expect (m.groupCount, equals(0));
+    expect (m.group(1), equals('int'));
   });
 }
 

@@ -122,6 +122,16 @@ class Schema {
         }
         break;
       default:
+        if (LIST.hasMatch(type)) {
+          Match m = LIST.firstMatch(type);
+          if (value is! List) {
+            return false;
+          } else {
+            if (! value.every((test) => _validate(test, m.group(1)))) {
+              return false;
+            }
+          }
+        }
         if (! types.containsKey(type)) {
           valid = false;
         } else {
@@ -149,4 +159,6 @@ class Schema {
     }
     return true;
   }
+  
+  static final RegExp LIST = new RegExp(r'\b(\w+)\b\[\]', multiLine: false, caseSensitive: true);
 }
