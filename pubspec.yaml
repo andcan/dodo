@@ -3,13 +3,14 @@ description: Dodo
 environment:
   sdk: '>=1.0.0+3.r30188'
 dependencies:
-  analyzer: 0.10.2
+  analyzer: 0.10.5
   args: 0.9.0
   browser: 0.9.0
   json: any
   crypto: 0.9.0
+  path: 1.0.0
   persistent: 0.8.0
-  polymer: 0.9.1+1
+  polymer: 0.9.4
   sqljocky: 0.9.0
   unittest: any
   utf: any

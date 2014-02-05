@@ -4,7 +4,7 @@ packages:
   analyzer:
     description: analyzer
     source: hosted
-    version: "0.10.2"
+    version: "0.10.5"
   args:
     description: args
     source: hosted
@@ -12,7 +12,7 @@ packages:
   barback:
     description: barback
     source: hosted
-    version: "0.9.0"
+    version: "0.11.0+2"
   browser:
     description: browser
     source: hosted
@@ -21,14 +21,10 @@ packages:
     description: crypto
     source: hosted
     version: "0.9.0"
-  csslib:
-    description: csslib
-    source: hosted
-    version: "0.9.0"
   custom_element:
     description: custom_element
     source: hosted
-    version: "0.9.0"
+    version: "0.9.1+2"
   html5lib:
     description: html5lib
     source: hosted
@@ -52,7 +48,7 @@ packages:
   observe:
     description: observe
     source: hosted
-    version: "0.9.1+1"
+    version: "0.9.3"
   options_file:
     description: options_file
     source: hosted
@@ -60,7 +56,7 @@ packages:
   path:
     description: path
     source: hosted
-    version: "0.9.0"
+    version: "1.0.0"
   persistent:
     description: persistent
     source: hosted
@@ -68,7 +64,7 @@ packages:
   polymer:
     description: polymer
     source: hosted
-    version: "0.9.1+1"
+    version: "0.9.4"
   polymer_expressions:
     description: polymer_expressions
     source: hosted
@@ -88,7 +84,7 @@ packages:
   stack_trace:
     description: stack_trace
     source: hosted
-    version: "0.9.0"
+    version: "0.9.1"
   template_binding:
     description: template_binding
     source: hosted

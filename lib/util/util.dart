@@ -2,6 +2,10 @@ library util;
 
 import 'dart:mirrors';
 
+part 'optional.dart';
+part 'mirror.dart';
+part 'src/mirror.dart';
+
 final isBool = (value) => value is bool;
 final isInt = (value) => value is int;
 final isNum = (value) => value is num;

@@ -71,19 +71,38 @@ class Schema {
       var field = fields[name];
       
       if (! json.containsKey(name)) {
-        return ! field.required;
+        if (null != field.defaultValue) {
+          json[name] = field.defaultValue;
+        } else {
+          if (field.required) {
+            return false;
+          }
+        }
       } else {
-        if (! _validate(json[name], field.type)) {
+        var optional = _validate(json[name], field);
+        if (optional.isAbsent) {
           return false;
         }
+        json[name] = optional.value;
       }
     }
     return true;
   }
   
-  bool _validate (value, String type) {
+  Optional _validate (value, Field field) {
+    int max = field.max;
+    int min = field.min;
+    String type = field.type;
+    
     if (null == value) {
-      return false;
+      if (null != field.defaultValue) {
+        return new Optional(field.defaultValue);
+      } else {
+        if (field.required) {
+          return new Optional.absent();
+        }
+        return new Optional(null);
+      }
     }
     
     bool valid = true;
@@ -93,27 +112,63 @@ class Schema {
     };
     
     switch (type) {
+      case 'bool':
+        valid = value is bool;
+        break;
       case 'int':
         if (value is! int) {
           if (value is! String) {
             valid = false;
           } else {
-            int.parse(value, onError: conversionError);
+            value = int.parse(value, onError: conversionError);
+          }
+        }
+        if (valid) {
+          if (null != max) {
+            valid = value <= max;
+          }
+          if (null != min) {
+            valid = valid && value >= min;
           }
         }
         break;
       case 'num':
-        if (value is! int) {
+        if (value is! num) {
           if (value is! String) {
             valid = false;
           } else {
-            double.parse(value, conversionError);
+            value = double.parse(value, conversionError);
+            if (null != max) {
+              valid = value <= max;
+            }
+            if (null != min) {
+              valid = valid && value >= min;
+            }
+          }
+        }
+        if (valid) {
+          if (null != max) {
+            valid = value <= max;
+          }
+          if (null != min) {
+            valid = value >= min;
           }
         }
         break;
       case 'string':
         if (value is! String) {
           valid = false;
+        } else {
+          if (null != max) {
+            valid = value.length <= max;
+          }
+          if (null != min) {
+            valid = valid && value.length >= min;
+          }
+          List<Format> format = field.format;
+          if (format.length > 0) {
+            valid = valid && field.format.any((format) => format.match.hasMatch(value));
+          }
         }
         break;
       case 'object':
@@ -125,39 +180,75 @@ class Schema {
         if (LIST.hasMatch(type)) {
           Match m = LIST.firstMatch(type);
           if (value is! List) {
-            return false;
+            valid = false;
           } else {
-            if (! value.every((test) => _validate(test, m.group(1)))) {
-              return false;
+            for (int i = 0; i < value.length; i++) {
+              var optional = _validate(value[i], new Field(field.defaultValue, field.format, field.max, field.min, field.required, m[1]));
+              if (optional.isAbsent) {
+                valid = false;
+                break;
+              }
+              value[i] = optional.value;
             }
           }
-        }
-        if (! types.containsKey(type)) {
-          valid = false;
         } else {
-          valid = _validateObject(value, types[type]);
+          if (! types.containsKey(type)) {
+            valid = false;
+          } else {
+            var optional = _validateObject(value, types[type], type);
+            if (optional.isAbsent) {
+              valid = false;
+            }
+            value = optional.value;
+          }
         }
         break;
     }
-    return valid;
+    return valid ? new Optional(value) : new Optional.absent();
   }
   
-  bool _validateObject (Map value, SjsType type) {
+  Optional _validateObject (Map map, SjsType type, [String typeName = null]) {
     var fields = type.fields;
     var names = fields.keys;
     for (String name in names) {
       Field field = fields[name];
-      if (field.required) {
-        if (!value.containsKey(name)) {
-          return false;
-        } else {
-          if (! _validate(value[name], field.type)) {
-            return false;
+      var value = map[name];
+      
+      if (! map.containsKey(name)) {
+        if (field.required) {
+          if (null == field.defaultValue) {
+            return new Optional.absent();
+          } else {
+            map[name] = field.defaultValue;
           }
+        } else {
+          map[name] = field.defaultValue;
         }
+      } else {
+        var optional = _validate(map[name], field);
+        if (optional.isAbsent) {
+          return optional;
+        }
+        map[name] = optional.value;
       }
     }
-    return true;
+    Optional value;
+    if (null != typeName) {
+      var instance;
+      try {
+        instance = newInstance(symbol(typeName), new Map.fromIterables(map.keys.map((f) => symbol(f)), map.values)).reflectee;
+      } on ArgumentError catch (e) {
+        instance = map;//Error while creating object. Falling back to map representation
+      }
+      if (null != instance) {
+        value = new Optional (instance);
+      } else {
+        value = new Optional(map);
+      }
+    } else {
+      value = new Optional(map);
+    }
+    return value;
   }
   
   static final RegExp LIST = new RegExp(r'\b(\w+)\b\[\]', multiLine: false, caseSensitive: true);

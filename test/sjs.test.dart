@@ -68,8 +68,8 @@ main () {
     };
     
     var fs = {
-      'a': new Field([], 10, 1, true, 'int'),
-      'b': new Field([fmt1], 2, 5, false, 'string')
+      'a': new Field(null, [], 10, 1, true, 'int'),
+      'b': new Field(null, [fmt1], 2, 5, false, 'string')
     };
     
     //expect (parseFields(fields, formats), equals (fs));//Test failed: Caught Illegal argument(s): format is dart.collection._LinkedHashMap expected other

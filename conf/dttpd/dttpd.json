@@ -1,0 +1,17 @@
+{
+  "bind": {
+    "address": "127.0.0.1",
+    "port": 8080
+  },
+  "rootDirectory": "/home/andrea/dttpd",
+  "routes": [
+    {
+      "match": {
+        "caseSensitive": true,
+        "multiLine": false,
+        "source": "/websocket"
+      },
+      "to": "/ws"
+    }
+  ]
+}

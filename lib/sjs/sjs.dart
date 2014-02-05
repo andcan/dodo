@@ -2,7 +2,7 @@ library sjs;
 
 import 'dart:mirrors';
 
-import '../util.dart';
+import '../util/util.dart';
 
 part 'key.dart';
 part 'schema.dart';

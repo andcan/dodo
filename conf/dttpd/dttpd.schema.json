@@ -1,8 +1,17 @@
 {
   "name": "dttpd",
   "fields": {
-    "mappings": {
-      "type": "Mapping[]"
+    "bind": {
+      "required": true,
+      "type": "Bind"
+    },
+    "rootDirectory": {
+      "required": true,
+      "type": "string"
+    },
+    "routes": {
+      "required": false,
+      "type": "Route[]"
     }
   },
   "formats": {
@@ -20,10 +29,46 @@
     }
   },
   "types": {
-    "Mapping": {
+    "Bind": {
       "fields": {
-        "path": {
-          "format": "path",
+        "address": {
+          "format": ["ipv4"],
+          "type": "string"
+        },
+        "port": {
+          "max": 65535,
+          "min": 0,
+          "type": "int"
+        }
+      },
+      "type": "object"
+    },
+    "Route": {
+      "fields": {
+        "match": {
+          "type": "RegExp"
+        },
+        "to": {
+          "format": ["path"],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "RegExp": {
+      "fields": {
+        "caseSensitive": {
+          "defaultValue": true,
+          "required": false,
+          "type": "bool"
+        },
+        "multiLine": {
+          "defaultValue": false,
+          "required": false,
+          "type": "bool"
+        },
+        "source": {
+          "required": true,
           "type": "string"
         }
       },

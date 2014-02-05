@@ -36,8 +36,8 @@ Map<String, dynamic> parse (Map parse, List<Key> keys) {
 
 Field parseField (Map properties, Map<String, Format> formats) {
   if (properties.keys.every(isString)) {
-    Map values = parse(properties, 
-        [Key.FORMAT, Key.MAX_NUM, Key.MIN_NUM, Key.REQUIRED, Key.TYPE_SCHEMA]);
+    Map values = parse(properties, [Key.DEFAULT_VALUE, Key.FORMAT, Key.MAX_NUM, 
+                                    Key.MIN_NUM, Key.REQUIRED, Key.TYPE_SCHEMA]);
     
     List<String> fieldFormat = values[Key.FORMAT.name] is String ? [values[Key.FORMAT.name]] : values['format'];
     var found = formats.keys.where((key) => fieldFormat.contains(key));
@@ -45,7 +45,7 @@ Field parseField (Map properties, Map<String, Format> formats) {
     List<Format> fs = [];
     found.forEach((value) => fs.add(formats[value]));
     
-    return new Field(fs, values[Key.MAX_NUM.name], values[Key.MIN_NUM.name],
+    return new Field(values[Key.DEFAULT_VALUE.name], fs, values[Key.MAX_NUM.name], values[Key.MIN_NUM.name],
         values[Key.REQUIRED.name], values[Key.TYPE_SCHEMA.name]);
   } else {
     throw new ArgumentError(ERROR_KEY_IS_NOT_STRING

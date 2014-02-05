@@ -12,6 +12,8 @@ class Key<T> {
   
   static final Key<bool> CASE_SENSITIVE = new Key._('caseSensitive', true, isBool);
   
+  static final Key<bool> DEFAULT_VALUE = new Key._('defaultValue', null, (_) => true);
+  
   static final Key<Map> FIELDS = new Key._('fields', {},
       (value) => value is Map<String, Field>);
   

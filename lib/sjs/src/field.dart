@@ -2,6 +2,10 @@ part of sjs;
 
 class Field extends SchemaEntity with HasType {
   /**
+   * Default value of this [Field].
+   */
+  final defaultValue;
+  /**
    * [Format] of this [Field].
    */
   final List<Format> format;
@@ -18,7 +22,7 @@ class Field extends SchemaEntity with HasType {
    */
   final bool required;
   
-  Field (this.format, this.max, this.min, this.required, String type) {
+  Field (this.defaultValue, this.format, this.max, this.min, this.required, String type) {
     this.type = type;
   }
   
