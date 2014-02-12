@@ -53,21 +53,30 @@ class Persistable<T> {
   const Persistable ({this.name: null, this.max, this.min, bool nullable: true}) :
     this.nullable = nullable;
   
-  bool validate (Comparable<T> value) {
-    if (value == null) {
+  bool validate (value) {
+    if(null == value) {
       return nullable;
-    }
-    if (min != null) {
-      if (min.compareTo(value) > 0) {
-        return false;
+    } else if (value is Comparable) {
+      if (min != null) {
+        if (min.compareTo(value) > 0) {
+          return false;
+        }
+      }
+      if (max != null) {
+        if (max.compareTo(value) < 0) {
+          return false;
+        }
+      }
+      return true;
+    } else {
+      if (value is List) {
+        final length = value.length;
+        return length >= min && length <= max;
+      } else {
+        //Unable to compare
+        throw new ArgumentError('Unable to validate $value');
       }
     }
-    if (max != null) {
-      if (max.compareTo(value) < 0) {
-        return false;
-      }
-    }
-    return true;
   }
 }
 

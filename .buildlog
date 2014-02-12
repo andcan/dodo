@@ -1,0 +1,75 @@
+---
+build.dart --machine --changed=lib/entity/enhanced/key.dart
+
+build.dart finished [2342 ms]
+
+---
+build.dart --machine --changed=bin/dodo.dart --changed=lib/entity/enhanced/entities.dart --changed=lib/entity/k...
+
+build.dart finished [5064 ms]
+
+---
+build.dart --machine --changed=lib/enhancer/enhancer.dart
+
+build.dart finished [1953 ms]
+
+---
+build.dart --machine --changed=lib/entity/enhanced/key.dart
+
+build.dart finished [1996 ms]
+
+---
+build.dart --machine --changed=lib/entity/enhanced/entities.dart --changed=lib/entity/enhanced/key.dart --chang...
+
+build.dart finished [2109 ms]
+
+---
+build.dart --machine --changed=lib/entity/key.dart
+
+build.dart finished [2057 ms]
+
+---
+build.dart --machine --changed=lib/enhancer/enhancer.dart
+
+build.dart finished [2043 ms]
+
+---
+build.dart --machine --changed=lib/enhancer/enhancer.dart
+
+build.dart finished [1909 ms]
+
+---
+build.dart --machine --changed=lib/enhancer/enhancer.dart
+
+build.dart finished [2066 ms]
+
+---
+build.dart --machine --changed=lib/entity/enhanced/entities.dart --changed=lib/entity/enhanced/key.dart --chang...
+
+build.dart finished [2019 ms]
+
+---
+build.dart --machine --changed=lib/orm/annotation.dart
+
+build.dart finished [1892 ms]
+
+---
+build.dart --machine --changed=lib/orm/annotation.dart
+
+build.dart finished [2106 ms]
+
+---
+build.dart --machine --changed=lib/orm/annotation.dart
+
+build.dart finished [2002 ms]
+
+---
+build.dart --machine --changed=lib/orm/annotation.dart
+
+build.dart finished [2094 ms]
+
+---
+build.dart --machine --changed=lib/entity/enhanced/entities.dart --changed=lib/entity/enhanced/key.dart --chang...
+
+build.dart finished [2021 ms]
+

@@ -2,5 +2,5 @@ import '../orm/orm.dart';
 
 class Key {
   @Id() String id;
-  @Persistable() String path;
+  @Persistable() List<int> path;
 }

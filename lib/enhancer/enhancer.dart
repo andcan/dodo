@@ -44,13 +44,15 @@ class FileEnhancer extends GeneralizingASTVisitor implements Enhancer<String, St
   }
   
   visitTypeName(TypeName node) {
-    _t = node;
+    _t = _t == null ? node : _t;
     super.visitTypeName(node);
   }
   
   visitVariableDeclaration(VariableDeclaration node) {
     super.visitVariableDeclaration(node);
     _e.members.add(new Member(_a, _t, node));
+    _a = null;
+    _t = null;
   }
 }
 
@@ -78,7 +80,7 @@ Future enhance (String entities, String enhanced) {
       }
     }
   }).whenComplete(() {
-    lib.writeAsString(fls.toString(), mode: WRITE);
+    lib.writeAsStringSync(fls.toString(), mode: WRITE);
     c.complete();
   });
   return c.future;

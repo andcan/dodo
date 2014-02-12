@@ -2,14 +2,14 @@ part of entities;
 
 class Key extends Entity<String> {
   Key.empty ();
-  Key ({String id, String path}) :    
+  Key ({String id, List<int> path}) :    
     _id = id, _path = path;
   factory Key.fromMap (Map<String, dynamic> map) {
     return new Key(id: map['id'], path: map['path']);
   }
   
   String _id;
-  String _path;
+  List<int> _path;
   
   List asArray () => [_id, _path];
   
@@ -18,7 +18,7 @@ class Key extends Entity<String> {
   Symbol get idFieldName => _SYMBOL_ID;
   
   String get id => _id;
-  String get path => _path;
+  List<int> get path => _path;
   int get hashCode {
     final int p = 37;
     int hash = 1;
@@ -35,7 +35,7 @@ class Key extends Entity<String> {
       throw new ArgumentError ('id is not valid');
     }
   }
-  set path (String path) {
+  set path (List<int> path) {
     if (_PERSISTABLE_PATH.validate(path)) {
       _path = path;
       propertyChanged(_SYMBOL_PATH);
@@ -44,8 +44,8 @@ class Key extends Entity<String> {
     }
   }
   bool operator == (Key e) => e.id == _id && e.path == _path;
-  static const String _SQL = 'CREATE TABLE Key (id VARCHAR(256) NOT NULL, path VARCHAR(256) NOT NULL, PRIMARY KEY(id));';
+  static const String _SQL = 'CREATE TABLE Key (id VARCHAR(256) NOT NULL, path null NOT NULL, PRIMARY KEY(id));';
   static const Symbol _SYMBOL_ID = const Symbol ('id'), _SYMBOL_PATH = const Symbol ('path');
-  static const Persistable _PERSISTABLE_ID = const StringPersistable (), _PERSISTABLE_PATH = const StringPersistable ();
+  static const Persistable _PERSISTABLE_ID = const StringPersistable (), _PERSISTABLE_PATH = const Persistable ();
 }
   
